@@ -12,39 +12,53 @@ inputProgram = [3,1033,1008,1033,1,1032,1005,1032,31,1008,1033,2,1032,1005,1032,
 memorySize = 5000
 #bad algorithm but run few times may give proper answer
 answer = 9999
-for i in range(25):
-  sx = 25
-  sy = 25
-  bw = 50
-  bl = 50
-  # main
-  itr = 0
-  scr = screen.screen(bw,bl)
-  cpu = computer.compu(inputProgram,[])
-  rb = repBot.repairBot(sx, sy, bw, bl)
-  scr.inp([sx, sy, 4])
-  process = True
-  cpuBuf = list()
-  aiBuf = list()
-  vidBuf = list()
-  road = list()
-  #find place
-  while process:
-    vidBuf, aiBuf = rb.process(cpuBuf)
-    if(len(aiBuf) == 0):
-      process = False
-    cpu.addInput(aiBuf)
-    status, cpuBuf = cpu.ProcessProgram()
-    scr.inp(vidBuf)
-    #time.sleep( 0.002 )
-    #wait = input("PRESS ENTER TO CONTINUE.")
-    #if itr %100 == 0:
-    #  scr.printScrean()
-    itr+=1
+sx = 25
+sy = 25
+bw = 50
+bl = 50
+# main
+itr = 0
+scr = screen.screen(bw,bl)
+cpu = computer.compu(inputProgram,[])
+rb = repBot.repairBot(sx, sy, bw, bl)
+scr.inp([sx, sy, 4])
+process = True
+cpuBuf = list()
+aiBuf = list()
+vidBuf = list()
+road = list()
+#find place
+while process:
+  vidBuf, aiBuf = rb.process(cpuBuf)
+  if(len(aiBuf) == 0):
+    process = False
+  cpu.addInput(aiBuf)
+  status, cpuBuf = cpu.ProcessProgram()
+  scr.inp(vidBuf)
+  #time.sleep( 0.002 )
+  #wait = input("PRESS ENTER TO CONTINUE.")
+  #scr.printScrean()
+  itr+=1
 
-  if answer > rb.minRoad:
-    answer = rb.minRoad
-  print("done iteration:")
-  print(i)
-print(answer)
+if answer > rb.minRoad:
+  answer = rb.minRoad
+# in this moment repBot should have map fully revealed
+# let us print this map with marked 
+scr.inp([rb.x,rb.y,0,rb.ox,rb.oy,6])
+#scr.printScrean()
+rb.current.append([rb.ox,rb.oy])
+rb.board[rb.oy][rb.ox] = 6
+working = True
+#print([rb.ox,rb.oy])
+itr = 0
+while working:
+  #time.sleep( 0.5 )
+  vout = rb.reoxygenizationTime()
+  if(len(vout) == 0):
+    working = False
+  scr.inp(vout)
+  #scr.printScrean()
+  #print(rb.current)
+  itr += 1
+print(itr - 2)
   

@@ -3,12 +3,17 @@ from random import randrange
 class repairBot:
 
   def __init__(self, x, y, width, lenght):
+    self.vout = list()
+    self.current = list()
+    self.nexti = list()
     self.lastWasOO = False
     self.curIsOO = False
     self.minRoad = 9999999999999
     self.roadList = [1]
     self.x = x
     self.y = y
+    self.ox = -1
+    self.oy = -1
     self.lc = 1
     self.widgth = width
     self.lenght = lenght
@@ -76,6 +81,8 @@ class repairBot:
         return []
       self.roadList.pop()
     if buf[0]==2:
+      self.ox = self.x
+      self.oy = self.y
       #wait = input("PRESS ENTER TO CONTINUE.")
       self.curIsOO = True
       if self.minRoad > len(self.roadList):
@@ -103,15 +110,15 @@ class repairBot:
     
 
     
-  def checkMoves(self):
+  def checkMoves(self, mode = 0):
     best = list()
-    if self.board[self.y-1][self.x] == 0:
+    if self.board[self.y-1][self.x] == mode:
       best.append(1)
-    if self.board[self.y+1][self.x] == 0:
+    if self.board[self.y+1][self.x] == mode:
       best.append(2)
-    if self.board[self.y][self.x-1] == 0:
+    if self.board[self.y][self.x-1] == mode:
       best.append(3)
-    if self.board[self.y][self.x+1] == 0:
+    if self.board[self.y][self.x+1] == mode:
       best.append(4)
 
     return best
@@ -124,3 +131,30 @@ class repairBot:
       retv = self.processVideo(buf)
       retl = self.processAi(buf)
     return retv, retl
+
+  def oxygenize(self, coord):
+    #check if not already processed
+
+    self.board[coord[1]][coord[0]] = 6
+    self.vout.append(coord[0])
+    self.vout.append(coord[1])
+    self.vout.append(6)
+    if self.board[coord[1]-1][coord[0]] == 2:
+      self.nexti.append([coord[0],coord[1]-1])
+    if self.board[coord[1]+1][coord[0]] == 2:
+      self.nexti.append([coord[0],coord[1]+1])
+    if self.board[coord[1]][coord[0]-1] == 2:
+      self.nexti.append([coord[0]-1,coord[1]])
+    if self.board[coord[1]][coord[0]+1] == 2:
+      self.nexti.append([coord[0]+1,coord[1]])
+
+    
+  def reoxygenizationTime(self):
+    self.vout=list()
+    for c in self.current:
+      self.oxygenize(c)
+    self.current = self.nexti
+    self.nexti = list()
+    return self.vout
+
+    
