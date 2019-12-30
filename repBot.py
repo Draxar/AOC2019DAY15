@@ -66,35 +66,40 @@ class repairBot:
     if buf[0]==1:
       return [self.lc]
     if buf[0]==0:
-      ran = randrange(2)
-      if self.lc == 1:
-        if ran == 1:
-          self.lc = 4
-        else:
-          self.lc = 3
-      elif self.lc == 2:
-        if ran == 1:
-          self.lc = 3
-        else:
-          self.lc = 4
-      elif self.lc == 3:
-        if ran == 1:
-          self.lc = 1
-        else:
-          self.lc = 2
-      elif self.lc == 4:
-        if ran == 1:
-          self.lc = 2
-        else:
-          self.lc = 1
-      return [self.lc]
+      best, good = self.checkMoves()
+      print(best)
+      print(good)
+      if len(best)>0:
+        return [best[randrange(len(best))]]
+      else:
+        return [good[randrange(len(good))]]
     if buf[0]==2:
       return []#finish
     
   def checkMoves(self):
     best = list()
     good = list()
+    if self.board[self.y-1][self.x] == 2:
+      good.append(1)
+    if self.board[self.y-1][self.x] == 0:
+      best.append(1)
 
+    if self.board[self.y+1][self.x] == 2:
+      good.append(2)
+    if self.board[self.y+1][self.x] == 0:
+      best.append(2)
+
+    if self.board[self.y][self.x-1] == 2:
+      good.append(3)
+    if self.board[self.y][self.x-1] == 0:
+      best.append(3)
+
+    if self.board[self.y][self.x+1] == 2:
+      good.append(4)
+    if self.board[self.y][self.x+1] == 0:
+      best.append(4)
+
+    return best, good
 
   def process(self, buf):
     if len(buf) == 0:
