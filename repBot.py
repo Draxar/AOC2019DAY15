@@ -3,6 +3,10 @@ from random import randrange
 class repairBot:
 
   def __init__(self, x, y, width, lenght):
+    self.lastWasOO = False
+    self.curIsOO = False
+    self.minRoad = 9999999999999
+    self.roadList = [1]
     self.x = x
     self.y = y
     self.lc = 1
@@ -16,7 +20,6 @@ class repairBot:
 
   def processVideo(self, buf):
     ret = list()
-    print(buf[0])
     if buf[0] == 0:
       #print wall in proper direction
       if self.lc == 1: #N
@@ -40,12 +43,17 @@ class repairBot:
         ret.append(1)
         self.board[self.y][self.x+1]=1
     if buf[0] == 1 or buf[0] == 2:
-      print(self.x)
-      print(self.y)
       # blank last ball
       ret.append(self.x)
       ret.append(self.y)
-      ret.append(0)
+      if self.lastWasOO == False:
+        if self.curIsOO == True:
+          self.curIsOO = False
+          self.lastWasOO == True
+        ret.append(5)
+      else:
+        self.lastWasOO == True
+        ret.append(2)
       self.board[self.y][self.x]=2 #seen
       #print ball in proper direction
       if self.lc == 1: #N
@@ -63,43 +71,50 @@ class repairBot:
 
   def processAi(self, buf):
     # first AI "circle:
-    if buf[0]==1:
-      return [self.lc]
     if buf[0]==0:
-      best, good = self.checkMoves()
-      print(best)
-      print(good)
-      if len(best)>0:
-        return [best[randrange(len(best))]]
-      else:
-        return [good[randrange(len(good))]]
+      if len(self.roadList) == 0:
+        return []
+      self.roadList.pop()
     if buf[0]==2:
-      return []#finish
+      #wait = input("PRESS ENTER TO CONTINUE.")
+      self.curIsOO = True
+      if self.minRoad > len(self.roadList):
+        self.minRoad = len(self.roadList)
+    best = self.checkMoves()
+    if len(best)>0:
+      self.lc = best.pop(randrange(len(best)))
+      self.roadList.append(self.lc)
+    else:
+      self.lc = self.retu()
+      if self.lc == []:
+        return []
+    return [self.lc]
+    
+  def retu(self):
+    if len(self.roadList) == 0:
+      return []
+    ret = self.roadList.pop()
+    if ret == 1 or ret == 3:
+      ret += 1
+    else:
+      ret -= 1
+    #wait = input("PRESS ENTER TO CONTINUE.")
+    return ret
+    
+
     
   def checkMoves(self):
     best = list()
-    good = list()
-    if self.board[self.y-1][self.x] == 2:
-      good.append(1)
     if self.board[self.y-1][self.x] == 0:
       best.append(1)
-
-    if self.board[self.y+1][self.x] == 2:
-      good.append(2)
     if self.board[self.y+1][self.x] == 0:
       best.append(2)
-
-    if self.board[self.y][self.x-1] == 2:
-      good.append(3)
     if self.board[self.y][self.x-1] == 0:
       best.append(3)
-
-    if self.board[self.y][self.x+1] == 2:
-      good.append(4)
     if self.board[self.y][self.x+1] == 0:
       best.append(4)
 
-    return best, good
+    return best
 
   def process(self, buf):
     if len(buf) == 0:

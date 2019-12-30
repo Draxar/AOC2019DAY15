@@ -7,7 +7,8 @@ class screen:
     1 : "█",
     2 : "#",
     3 : "_",
-    4 : "o"
+    4 : "o",
+    5 : "."
   }
   def __init__(self, width, lenght):
     self.score = 0
